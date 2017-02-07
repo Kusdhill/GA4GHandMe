@@ -8,6 +8,15 @@ import os
 from optparse import OptionParser
 from requests_oauthlib import OAuth2Session
 
+
+myRequest = "https://api.23andme.com/3/profile/'+profile_id+'/variant/?accession_id=NC_012920.1"
+
+class myRequest:
+	base = ""
+	profile_id = ""
+	request_type = ""
+	accession_id = ""
+
 PORT = 5000
 API_SERVER = 'api.23andme.com'
 BASE_CLIENT_URL = 'http://localhost:%s/' % PORT
@@ -25,7 +34,7 @@ DEFAULT_SCOPES = ['names', 'basic','email', 'genomes'] #+DEFAULT_SNPS#
 #
 # the command line will ask for a client_secret if you choose to not hardcode the app's client_secret here
 #
-client_secret = ''
+client_secret = '93e94c2a4233263b240e69ffc94863b6'
 
 parser = OptionParser(usage="usage: %prog -i CLIENT_ID [options]")
 parser.add_option("-i", "--client-id", dest="client_id", default='',
@@ -117,14 +126,23 @@ def receive_code():
     account_response_json = account_response.json()
     # Need to change below in the future, why multiple indeces for 1 profile?
     profile_id = account_response_json['data'][0]['profiles'][0]['id']
-    profile_variant_response = requests.get('https://api.23andme.com/3/profile/'+profile_id+'/variant/?accession_id=NC_012920.1',headers=headers, verify=False)
+    myRequest.base = 'https://api.23andme.com/3/profile/'
+    myRequest.profile_id = profile_id+'/'
+    myRequest.request_type = 'variant/'
+    myRequest.accession_id = '?accession_id=NC_012920.1'
+
+    execfile("translate.py")
+    print(myRequest.base+myRequest.profile_id+myRequest.request_type+myRequest.accession_id)
+    #'https://api.23andme.com/3/profile/'+profile_id+'/variant/?accession_id=NC_012920.1'
+
+    profile_variant_response = requests.get(myRequest.base+myRequest.profile_id+myRequest.request_type+myRequest.accession_id,headers=headers, verify=False)
     profile_variant_response_json = profile_variant_response.json()
 
 
     if profile_variant_response.status_code == 200:
-        print(account_response_json)
-        print(profile_id)
-        print(profile_variant_response_json)
+        #print(account_response_json)
+        #print(profile_id)
+        #print(profile_variant_response_json)
 
         #return flask.render_template('receive_code.html', response_json=profile_variant_response_json)
         return flask.jsonify(profile_variant_response_json)
