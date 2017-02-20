@@ -7,6 +7,7 @@ from flask import request
 import os
 from optparse import OptionParser
 from requests_oauthlib import OAuth2Session
+import keys
 
 
 myRequest = "https://api.23andme.com/3/profile/'+profile_id+'/variant/?accession_id=NC_012920.1"
@@ -34,11 +35,9 @@ DEFAULT_SCOPES = ['names', 'basic','email', 'genomes'] #+DEFAULT_SNPS#
 #
 # the command line will ask for a client_secret if you choose to not hardcode the app's client_secret here
 #
-client_secret = '93e94c2a4233263b240e69ffc94863b6'
+client_secret = keys.client_secret
 
 parser = OptionParser(usage="usage: %prog -i CLIENT_ID [options]")
-parser.add_option("-i", "--client-id", dest="client_id", default='',
-                  help="Your client_id [REQUIRED]")
 parser.add_option('-s', '--scopes', dest='scopes', action='append', default=[],
                   help='Your requested scopes. Eg: -s basic -s rs12913832')
 parser.add_option("-r", "--redirect_uri", dest="redirect_uri", default=DEFAULT_REDIRECT_URI,
@@ -57,15 +56,9 @@ if options.select_profile:
     API_AUTH_URL += '?select_profile=true'
 
 redirect_uri = options.redirect_uri
-client_id = options.client_id
+client_id = keys.client_id
 
 scopes = options.scopes or DEFAULT_SCOPES
-
-if not options.client_id:
-    print "missing param: CLIENT_ID:"
-    parser.print_usage()
-    print "Please navigate to your developer dashboard [%s/dev/] to retrieve your client_id.\n" % BASE_API_URL
-    exit()
 
 if not client_secret:
     print "Please navigate to your developer dashboard [%s/dev/] to retrieve your client_secret." % BASE_API_URL
@@ -131,7 +124,7 @@ def receive_code():
     myRequest.request_type = 'variant/'
     myRequest.accession_id = '?accession_id=NC_012920.1'
 
-    execfile("translate.py")
+    #execfile("translate.py")
     print(myRequest.base+myRequest.profile_id+myRequest.request_type+myRequest.accession_id)
     #'https://api.23andme.com/3/profile/'+profile_id+'/variant/?accession_id=NC_012920.1'
 
