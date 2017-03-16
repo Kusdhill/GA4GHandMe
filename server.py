@@ -5,12 +5,12 @@ import requests
 import flask
 import json
 from flask import request
+from flask import session
 import os
 from optparse import OptionParser
 from requests_oauthlib import OAuth2Session
 import keys
 from ga4gh.schemas import protocol as p
-
 
 PORT = 5000
 API_SERVER = 'api.23andme.com'
@@ -58,11 +58,19 @@ if not client_secret:
     print "Please navigate to your developer dashboard [%s/dev/] to retrieve your client_secret." % BASE_API_URL
     client_secret = getpass.getpass("Please enter your client_secret:")
 
+
+# GA4GH chromosome value to NC ID
+chromeToAccession = {'1':'NC_000001.10', '2':'NC_000002.11', '3':'NC_000003.11', '4':'NC_000004.11', '5':'NC_000005.9', '6':'NC_000006.11', 
+                     '7':'NC_000007.13', '8':'NC_000008.10', '9':'NC_000009.11', '10':'NC_000010.10', '11':'NC_000011.9', '12':'NC_000012.11', 
+                     '13':'NC_000013.10', '14':'NC_000014.8', '15':'NC_000015.9', '16':'NC_000016.9', '17':'NC_000017.10', '18':'NC_000018.9', 
+                     '19':'NC_000019.9', '20':'NC_000020.10', '21':'NC_000021.8', '22':'NC_000022.10', 'X':'NC_000023.10', 'Y':'NC_000024.9'}
+
 app = flask.Flask(__name__)
 
 
 
-
+### Show index page, begin oauth process
+### Go to api callback /oauth
 @app.route('/')
 def index():
     print("\nIn index")
@@ -79,7 +87,9 @@ def index():
 
 
 
-
+### Retrieve access token and complete oauth process
+### Retrieve user profile id
+### Call ga4gh() to begin parameter entry
 @app.route('/oauth')
 def oauth():
 
@@ -110,8 +120,20 @@ def oauth():
     print(token_dict)
     access_token = token_dict['access_token']
 
+    headers = {'Authorization': 'Bearer %s' % access_token}
+    account_response = requests.get('https://api.23andme.com/3/account/',headers=headers, verify=False)
+    account_response_json = account_response.json()
+    profile_id = account_response_json['data'][0]['profiles'][0]['id']
+
+    session['headers'] = headers
+    session['profile_id'] = profile_id
+
     return(ga4gh())
 
+
+
+
+### Prompt user for search_variants_request parameters using ga4gh.html
 def ga4gh():
     print("\nin ga4gh")
     submit_ga4gh = "http://localhost:5000/variants/search"
@@ -119,7 +141,9 @@ def ga4gh():
 
 
 
-
+### Post users entered parameters
+### Store parameters in protocol buffer
+### Send off protocol buffer to translate()
 @app.route('/variants/search', methods=['POST'])
 def search_variants():
     print("\nin search_variants")
@@ -140,7 +164,7 @@ def search_variants():
 
 
 
-
+### Convert ga4gh request into 23andMe request
 @app.route('/ga4gh/translate')
 def translate(ga4gh_request):
     print("\nin translate")
@@ -150,7 +174,13 @@ def translate(ga4gh_request):
     print(ga4gh_request)
     print(ga4gh_request.start)
 
-    #ttam_request =
+    profile_id = session.get('profile_id')
+    headers = session.get('headers')
+
+
+    ttam_request = 'https://api.23andme.com/3/profile/'+profile_id+'/variant/?accession_id='+chromeToAccession[ga4gh_request.reference_name]+'&start='+str(ga4gh_request.start)+'&stop='+str(ga4gh_request.end)
+
+    print(ttam_request)
 
     # make a 23andMe request template
     # oauth
@@ -161,17 +191,8 @@ def translate(ga4gh_request):
 
     return(flask.jsonify({}))
 
+app.secret_key = keys.sessions_key
 
-
-'''
-# Convert GA4GH chromosome to NC ID
-accessionToChrome = {'1':'NC_000001.10'}
-
-accessionToChrome = {'1':'NC_000001.10', '2':'NC_000002.11', '3':'NC_000003.11', '4':'NC_000004.11', '5':'NC_000005.9', '6':'NC_000006.11', 
-                     '7':'NC_000007.13', '8':'NC_000008.10', '9':'NC_000009.11', '10':'NC_000010.10', '11':'NC_000011.9', '12':'NC_000012.11', 
-                     '13':'NC_000013.10', '14':'NC_000014.8', '15':'NC_000015.9', '16':'NC_000016.9', '17':'NC_000017.10', '18':'NC_000018.9', 
-                     '19':'NC_000019.9', '20':'NC_000020.10', '21':'NC_000021.8', '22':'NC_000022.10', 'X':'NC_000023.10', 'Y':'NC_000024.9'}
-'''
 
 if __name__ == '__main__':
     print "A local client for the Personal Genome API is now initialized."
