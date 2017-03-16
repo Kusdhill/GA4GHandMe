@@ -12,14 +12,6 @@ import keys
 from ga4gh.schemas import protocol as p
 
 
-myRequest = "https://api.23andme.com/3/profile/'+profile_id+'/variant/?accession_id=NC_012920.1"
-
-class myRequest:
-    base = ""
-    profile_id = ""
-    request_type = ""
-    accession_id = ""
-
 PORT = 5000
 API_SERVER = 'api.23andme.com'
 BASE_CLIENT_URL = 'http://localhost:%s/' % PORT
