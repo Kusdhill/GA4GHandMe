@@ -97,6 +97,8 @@ def oauth():
 	print(redirect_uri)
 	print(request.url)
 
+	session['input_link'] = request.url
+
 	#
 	# now we hit the /token endpoint to get the access_token
 	#
@@ -189,13 +191,21 @@ def translate_request(ga4gh_request):
 
 
 	headers = session.get('headers')
+	input_link = session.get('input_link')
+	#<p><a href="{{input link}}">Click here</a> to enter another query.</p>
+
 
 	print('sending request')
 	profile_variant_response = requests.get(ttam_request,headers=headers, verify=False)
 	profile_variant_response_json = profile_variant_response.json()
 
+
+	print(profile_variant_response_json['data'])
+
+
 	if profile_variant_response.status_code == 200:
-		return flask.jsonify(profile_variant_response_json)
+		#return flask.render_template('receive_code.html', response_json=profile_variant_response_json)
+		return(flask.jsonify(profile_variant_response_json))
 	else:
 		# print 'response text = ', genotype_response.text
 		profile_variant_response.raise_for_status()
