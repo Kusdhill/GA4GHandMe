@@ -11,6 +11,7 @@ from optparse import OptionParser
 from requests_oauthlib import OAuth2Session
 import keys
 from ga4gh.schemas import protocol as p
+import ga4gh.schemas.ga4gh.variant_service_pb2 as v
 
 PORT = 5000
 API_SERVER = 'api.23andme.com'
@@ -200,7 +201,15 @@ def translate_request(ga4gh_request):
 	profile_variant_response_json = profile_variant_response.json()
 
 
-	print(profile_variant_response_json['data'])
+
+
+
+#### Under construction
+	for i in range(0,len(profile_variant_response_json['data'])):
+		print(profile_variant_response_json['data'][i]['allele'])
+####
+
+
 
 
 	if profile_variant_response.status_code == 200:
@@ -214,8 +223,17 @@ def translate_request(ga4gh_request):
 	return(flask.jsonify({}))
 
 
-
-
+### Conversion to do:
+### accession_id to 	reference_name
+### allele 		 to 	reference_bases?
+### start 		 to 	start
+### end 		 to 	end
+### 
+###	To fill?:
+### variant_set_id
+### call_set_ids
+### alternate_bases?
+### variant type
 
 app.secret_key = keys.sessions_key
 
