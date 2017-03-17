@@ -11,7 +11,7 @@ from optparse import OptionParser
 from requests_oauthlib import OAuth2Session
 import keys
 from ga4gh.schemas import protocol as p
-import ga4gh.schemas.ga4gh.variant_service_pb2 as v
+import ga4gh.schemas.ga4gh.variants_pb2 as v
 
 PORT = 5000
 API_SERVER = 'api.23andme.com'
@@ -152,34 +152,36 @@ def search_variants():
 	print("\nin search_variants")
 
 	#aRequest = flask.request.get_json(force=True)
+	print("converting request")
 	start_pos = request.form['start_pos']
 	end_pos = request.form['end_pos']
 	chrome = request.form['chrome']
+	session['chrome'] = chrome
 
 	aRequest = {"start": start_pos, "end": end_pos, "referenceName": chrome, "variantSetId": "abc"}
 
 
 	print(aRequest)
+	# using ga4gh protocol buffer, stuff parameters into SearchVariantsRequest
 	proto_request = p.fromJson(json.dumps(aRequest), p.SearchVariantsRequest)
 	
-	return(translate_request(proto_request))
+	return(translate(proto_request))
 
 
 
 
 ### Convert ga4gh request into 23andMe request
 ### Send off converted ga4gh -> 23andMe request
-@app.route('/translate/request')
-def translate_request(ga4gh_request):
+@app.route('/translate')
+def translate(ga4gh_request):
 	print("\nin translate")
 
-	print("translation process")
 
 	print(ga4gh_request)
 
 	profile_id = session.get('profile_id')
 	#chromeToAccession[ga4gh_request.reference_name]
-	ttam_request = 'https://api.23andme.com/3/profile/'+profile_id+'/variant/?accession_id='+'NC_012920.1'+'&start='+str(ga4gh_request.start)+'&end='+str(ga4gh_request.end)
+	ttam_request = 'https://api.23andme.com/3/profile/'+profile_id+'/variant/?accession_id='+chromeToAccession[ga4gh_request.reference_name]+'&start='+str(ga4gh_request.start)+'&end='+str(ga4gh_request.end)
 
 	print(ttam_request)
 
@@ -203,11 +205,17 @@ def translate_request(ga4gh_request):
 
 
 
-
+	print('converting response')
 #### Under construction
-	for i in range(0,len(profile_variant_response_json['data'])):
-		print(profile_variant_response_json['data'][i]['allele'])
+	#for i in range(0,len(profile_variant_response_json['data'])):
+	#ga4gh_response = v.SearchVariantsResponse(alternate_bases=profile_variant_response_json['data'][0]['allele'])
+	#print(p.toJson(ga4gh_response))
+	ttam_response = profile_variant_response_json['data'][0]
+	print(v.Variant(reference_name=session['chrome'], alternate_bases=ttam_response['allele'], reference_bases=ttam_response['allele'], start=ttam_response['start'], end=ttam_response['end'], variant_set_id='1'))
 ####
+# table
+# report request
+# grch? what reference, grch38, querying 1kgenomes.ga4gh.org/ga4gh/reference/search, along those lines for reference bases
 
 
 
@@ -225,15 +233,16 @@ def translate_request(ga4gh_request):
 
 ### Conversion to do:
 ### accession_id to 	reference_name
-### allele 		 to 	reference_bases?
+### allele 		 to 	alternate_bases?
 ### start 		 to 	start
 ### end 		 to 	end
-### 
+### variant_set_id = 1
+### call_set_ids = whatever id used to query (whoever im querying against), otherwise number 1
+
 ###	To fill?:
-### variant_set_id
-### call_set_ids
-### alternate_bases?
-### variant type
+### table
+### reference_bases, perhaps go get it
+### variant type, none, can use other 23andme request to get if needed (get_report)
 
 app.secret_key = keys.sessions_key
 
