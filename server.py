@@ -164,7 +164,7 @@ def search_variants():
 	print(aRequest)
 	# using ga4gh protocol buffer, stuff parameters into SearchVariantsRequest
 	proto_request = p.fromJson(json.dumps(aRequest), p.SearchVariantsRequest)
-	
+
 	return(translate(proto_request))
 
 
@@ -206,23 +206,28 @@ def translate(ga4gh_request):
 
 
 	print('converting response')
+	ttam_response = profile_variant_response_json['data']
 #### Under construction
-	#for i in range(0,len(profile_variant_response_json['data'])):
-	#ga4gh_response = v.SearchVariantsResponse(alternate_bases=profile_variant_response_json['data'][0]['allele'])
-	#print(p.toJson(ga4gh_response))
-	ttam_response = profile_variant_response_json['data'][0]
-	print(v.Variant(reference_name=session['chrome'], alternate_bases=ttam_response['allele'], reference_bases=ttam_response['allele'], start=ttam_response['start'], end=ttam_response['end'], variant_set_id='1'))
+	# have to return like this because flask doesn't allow otherwise for security purposes
+	ga4gh_response = {'data':[]}
+	for i in range(0,len(ttam_response),2):
+		# had to switch from p.Variant to something else due to json serialization errors. this took hours of head banging :(
+		response = {'reference_name':session['chrome'], 'alternate_bases':[ttam_response[i+1]['allele']], 'reference_bases':ttam_response[i]['allele'], 'start':ttam_response[i]['start'], 'end':ttam_response[i]['end'], 'variant_set_id':'1'}
+
+
+		proto_response = p.fromJson(json.dumps(response), v.Variant)
+		print(proto_response)
+
+		ga4gh_response['data'].append(response)
 ####
-# table
-# report request
-# grch? what reference, grch38, querying 1kgenomes.ga4gh.org/ga4gh/reference/search, along those lines for reference bases
-
-
+	
+	print("out loop")
+	print(ga4gh_response['data'][0])
 
 
 	if profile_variant_response.status_code == 200:
 		#return flask.render_template('receive_code.html', response_json=profile_variant_response_json)
-		return(flask.jsonify(profile_variant_response_json))
+		return(flask.jsonify(ga4gh_response))
 	else:
 		# print 'response text = ', genotype_response.text
 		profile_variant_response.raise_for_status()
@@ -230,6 +235,10 @@ def translate(ga4gh_request):
 	#return(request(ttam_request))
 	return(flask.jsonify({}))
 
+
+### table
+### report request
+### grch? what reference, grch38, querying 1kgenomes.ga4gh.org/ga4gh/reference/search, along those lines for reference bases
 
 ### Conversion to do:
 ### accession_id to 	reference_name
