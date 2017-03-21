@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"> </script>
+<style>
+table {
+		font-family: arial, sans-serif;
+		border-collapse: collapse;
+		width: 100%;
+}
+
+td, th {
+		border: 1px solid #dddddd;
+		text-align: left;
+		padding: 8px;
+}
+
+tr:nth-child(even) {
+		background-color: #dddddd;
+}
+</style>
+</head>
+<body>
+
+<script>
+	function execute(){
+		var ga4gh_response = document.getElementById("ga4gh_response").innerHTML; //load in server.py output
+		ga4gh_response_string = JSON.stringify(ga4gh_response);	//convert to string for JSON.parse
+		ga4gh_response_string = ga4gh_response_string.replace(/'/g, '"') //replace single quotes with double quotes
+		ga4gh_response_string = ga4gh_response_string.slice(1, -1); //remove first and last quotes
+
+		ga4gh_response_json = JSON.parse(ga4gh_response_string)	//convert to javascript friendly JSON
+
+		// for every result in the json, this loop creates a row entry that will be put into the data table
+		var tblRow = ""
+		for(i=0; i<ga4gh_response_json.data.length; i++){
+
+			tblRow += "<tr>" + "<td>" + ga4gh_response_json.data[i].start + "</td>" + "<td>" + ga4gh_response_json.data[i].end + "</td>" + "<td>" + ga4gh_response_json.data[i].reference_bases + "</td>" + "<td>" + ga4gh_response_json.data[i].alternate_bases + "</td>" + "</tr>"
+
+		}
+
+		div = document.getElementById('user_data');
+		div.insertAdjacentHTML( 'beforeend', tblRow);
+	}
+
+	// run execute once the DOM has loaded
+	window.onload = execute;
+
+</script>
+<table id='user_data'>
+	<tr>
+		<th>start</th>
+		<th>end</th>
+		<th>reference_bases</th>
+		<th>alternate_bases</th>
+	</tr>
+	<div id="results"></div>
+</table>
+<br>
+<br>
+<br>
+<br>
+<p>Raw JSON</p>
+<div id="ga4gh_response">{{ga4gh_response}}</div>
+
+</body>
+</html>

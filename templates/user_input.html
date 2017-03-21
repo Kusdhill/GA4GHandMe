@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block body %}
+<p>This is a search_variants_request. Enter the desired parameters:</p>
+
+<form action="{{auth_url}}" enctype='application/json' method="POST">
+  start:<br>
+  <input type="text" name="start_pos" value="1">
+  <br>
+  end:<br>
+  <input type="text" name="end_pos" value="1000000">
+  <br>
+  reference name:<br>
+  <input type="text" name="chrome" value="1">
+  <br><br>
+  <input type="submit" value="Submit">
+{% endblock %}
