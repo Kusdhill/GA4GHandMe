@@ -11,14 +11,16 @@ against their 23andMe variant information.
 
 To begin, make sure you have the GA4GH client <a href="http://ga4gh-reference-implementation.readthedocs.io/en/latest/demo.html">setup</a>.
 
-You will also need to make a <a href="http://docs.python-guide.org/en/latest/dev/virtualenvs/">virtual environment</a>. With the virual environment running, go ahead and run
+You will also need to make a <a href="http://docs.python-guide.org/en/latest/dev/virtualenvs/">virtual environment</a>. With the virual environment running, go ahead and install the requirements.
 
 ```
 pip install requirements.txt
 ```
 
-After this is all complete, you can start up the server using 
+After this is all complete, you can start up the server using
 
 ```
 python server.py
 ```
+
+and navigate to localhost:5000.
