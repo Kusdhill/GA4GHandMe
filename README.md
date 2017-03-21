@@ -23,4 +23,4 @@ After this is all complete, you can start up the server using
 python server.py
 ```
 
-and navigate to localhost:5000.
+and navigate to localhost:5000. The only thing you need to do from here is sign into 23andMe and follow the prompts. Enjoy!
