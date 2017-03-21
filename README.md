@@ -22,7 +22,7 @@ Once that's setup, make a <a href="http://docs.python-guide.org/en/latest/dev/vi
 pip install requirements.txt
 ```
 
-After this is all complete, you can start up the server using
+After this is all complete, you can start up the server.
 
 ```
 python server.py
