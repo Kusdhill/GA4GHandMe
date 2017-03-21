@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import getpass
 import requests
 import flask
@@ -14,41 +12,35 @@ from ga4gh.schemas import protocol as p
 import ga4gh.schemas.ga4gh.variants_pb2 as v
 
 PORT = 5000
-API_SERVER = 'api.23andme.com'
-BASE_CLIENT_URL = 'http://localhost:%s/' % PORT
-DEFAULT_REDIRECT_URI = '%soauth' % BASE_CLIENT_URL
+API_SERVER = "api.23andme.com"
+BASE_CLIENT_URL = "http://localhost:%s/" % PORT
+DEFAULT_REDIRECT_URI = "%soauth" % BASE_CLIENT_URL
 
-# so we don't get errors if the redirect uri is not https
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = '1'
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-#
-# you can pass in more scopes through the command line, or change these
-#
-DEFAULT_SNPS = ['rs12913832']
-DEFAULT_SCOPES = ['names', 'basic','email', 'genomes'] #+DEFAULT_SNPS#
+DEFAULT_SNPS = ["rs12913832"]
+DEFAULT_SCOPES = ["names", "basic","email", "genomes"]
 
-#
-# the command line will ask for a client_secret if you choose to not hardcode the app's client_secret here
-#
+
 client_secret = keys.client_secret
 
 parser = OptionParser(usage="usage: %prog -i CLIENT_ID [options]")
-parser.add_option('-s', '--scopes', dest='scopes', action='append', default=[],
-				  help='Your requested scopes. Eg: -s basic -s rs12913832')
+parser.add_option("-s", "--scopes", dest="scopes", action="append", default=[],
+				  help="Your requested scopes. Eg: -s basic -s rs12913832")
 parser.add_option("-r", "--redirect_uri", dest="redirect_uri", default=DEFAULT_REDIRECT_URI,
-				  help="Your client's redirect_uri [%s]" % DEFAULT_REDIRECT_URI)
+				  help="Your clients redirect_uri [%s]" % DEFAULT_REDIRECT_URI)
 parser.add_option("-a", "--api_server", dest="api_server", default=API_SERVER,
 				  help="Almost always: [api.23andme.com]")
-parser.add_option("-p", "--select-profile", dest='select_profile', action='store_true', default=False,
-				  help='If present, the auth screen will show a profile select screen')
+parser.add_option("-p", "--select-profile", dest="select_profile", action="store_true", default=False,
+				  help="If present, the auth screen will show a profile select screen")
 
 (options, args) = parser.parse_args()
 BASE_API_URL = "https://%s" % options.api_server
-API_AUTH_URL = '%s/authorize' % BASE_API_URL
-API_TOKEN_URL = '%s/token/' % BASE_API_URL
+API_AUTH_URL = "%s/authorize" % BASE_API_URL
+API_TOKEN_URL = "%s/token/" % BASE_API_URL
 
 if options.select_profile:
-	API_AUTH_URL += '?select_profile=true'
+	API_AUTH_URL += "?select_profile=true"
 
 redirect_uri = options.redirect_uri
 client_id = keys.client_id
@@ -61,10 +53,10 @@ if not client_secret:
 
 
 # GA4GH chromosome value to NC ID
-chromeToAccession = {'1':'NC_000001.10', '2':'NC_000002.11', '3':'NC_000003.11', '4':'NC_000004.11', '5':'NC_000005.9', '6':'NC_000006.11', 
-					 '7':'NC_000007.13', '8':'NC_000008.10', '9':'NC_000009.11', '10':'NC_000010.10', '11':'NC_000011.9', '12':'NC_000012.11', 
-					 '13':'NC_000013.10', '14':'NC_000014.8', '15':'NC_000015.9', '16':'NC_000016.9', '17':'NC_000017.10', '18':'NC_000018.9', 
-					 '19':'NC_000019.9', '20':'NC_000020.10', '21':'NC_000021.8', '22':'NC_000022.10', 'X':'NC_000023.10', 'Y':'NC_000024.9'}
+chromeToAccession = {"1":"NC_000001.10", "2":"NC_000002.11", "3":"NC_000003.11", "4":"NC_000004.11", "5":"NC_000005.9", "6":"NC_000006.11", 
+					 "7":"NC_000007.13", "8":"NC_000008.10", "9":"NC_000009.11", "10":"NC_000010.10", "11":"NC_000011.9", "12":"NC_000012.11", 
+					 "13":"NC_000013.10", "14":"NC_000014.8", "15":"NC_000015.9", "16":"NC_000016.9", "17":"NC_000017.10", "18":"NC_000018.9", 
+					 "19":"NC_000019.9", "20":"NC_000020.10", "21":"NC_000021.8", "22":"NC_000022.10", "X":"NC_000023.10", "Y":"NC_000024.9"}
 
 app = flask.Flask(__name__)
 
@@ -72,65 +64,46 @@ app = flask.Flask(__name__)
 
 ### Show index page, begin oauth process
 ### Go to api callback /oauth
-@app.route('/')
+@app.route("/")
 def index():
-	print("\nIn index")
+	print("in index")
 	print(DEFAULT_REDIRECT_URI)
 	ttam_oauth = OAuth2Session(client_id,
 							   redirect_uri=redirect_uri,
 							   scope=scopes)
 	auth_url, state = ttam_oauth.authorization_url(API_AUTH_URL)
 
-	print("redirect= "+redirect_uri)
-	print("api auth url= "+API_AUTH_URL)
-	print("auth url= "+auth_url)
-	return flask.render_template('index.html', auth_url=auth_url)
+	return flask.render_template("index.html", auth_url=auth_url)
 
 
 
 ### Retrieve access token and complete oauth process
 ### Retrieve user profile id
 ### Call ga4gh() to begin parameter entry
-@app.route('/oauth')
+@app.route("/oauth")
 def oauth():
 
-	print("\nin oauth")
-	print(redirect_uri)
-	print(request.url)
+	print("authenticating...")
 
-	session['input_link'] = request.url
-
-	#
-	# now we hit the /token endpoint to get the access_token
-	#
+	# authentification information
 	ttam_oauth = OAuth2Session(client_id,
 							   redirect_uri=redirect_uri)
 	token_dict = ttam_oauth.fetch_token(API_TOKEN_URL,
 										client_secret=client_secret,
 										authorization_response=request.url)
 
-	#
-	# the response token_dict is of the form
-	# {
-	#     'token_type': 'bearer',
-	#     'refresh_token': '7cb92495fe515f0bfe94775e2b06b46b',
-	#     'access_token': 'ad7ace51ad19732b3f9ef778dc766fce',
-	#     'scope': ['rs12913832', 'names', 'basic'],
-	#     'expires_in': 86400, 'expires_at': 1475283697.571757
-	# }
-	#
+	access_token = token_dict["access_token"]
 
-	print(token_dict)
-	access_token = token_dict['access_token']
-
-	headers = {'Authorization': 'Bearer %s' % access_token}
-	account_response = requests.get('https://api.23andme.com/3/account/',headers=headers, verify=False)
+	headers = {"Authorization": "Bearer %s" % access_token}
+	account_response = requests.get("https://api.23andme.com/3/account/",headers=headers, verify=False)
 	account_response_json = account_response.json()
-	profile_id = account_response_json['data'][0]['profiles'][0]['id']
+	profile_id = account_response_json["data"][0]["profiles"][0]["id"]
 
-	session['headers'] = headers
-	session['profile_id'] = profile_id
+	# store headers and profile_id in session so that we can use it in the flask portion of the application
+	session["headers"] = headers
+	session["profile_id"] = profile_id
 
+	# after oauth has completed, begin actual request
 	return(ga4gh())
 
 
@@ -138,30 +111,26 @@ def oauth():
 
 ### Prompt user for search_variants_request parameters using ga4gh.html
 def ga4gh():
-	print("\nin ga4gh")
+	print("input data...")
 	submit_ga4gh = "http://localhost:5000/variants/search"
-	return flask.render_template('ga4gh.html', auth_url=submit_ga4gh)
+	return flask.render_template("user_input.html", auth_url=submit_ga4gh)
 
 
 
 ### Post users entered parameters
 ### Store parameters in protocol buffer
 ### Send off protocol buffer to translate()
-@app.route('/variants/search', methods=['POST'])
+@app.route("/variants/search", methods=["POST"])
 def search_variants():
-	print("\nin search_variants")
 
-	#aRequest = flask.request.get_json(force=True)
-	print("converting request")
-	start_pos = request.form['start_pos']
-	end_pos = request.form['end_pos']
-	chrome = request.form['chrome']
-	session['chrome'] = chrome
+	print("converting request to GA4GH")
+	start_pos = request.form["start_pos"]
+	end_pos = request.form["end_pos"]
+	chrome = request.form["chrome"]
+	session["chrome"] = chrome
 
 	aRequest = {"start": start_pos, "end": end_pos, "referenceName": chrome, "variantSetId": "abc"}
 
-
-	print(aRequest)
 	# using ga4gh protocol buffer, stuff parameters into SearchVariantsRequest
 	proto_request = p.fromJson(json.dumps(aRequest), p.SearchVariantsRequest)
 
@@ -170,91 +139,46 @@ def search_variants():
 
 
 
-### Convert ga4gh request into 23andMe request
-### Send off converted ga4gh -> 23andMe request
-@app.route('/translate')
+### Convert GA4GH request into 23andMe request
+### Send off converted GA4GH -> 23andMe request
+@app.route("/translate")
 def translate(ga4gh_request):
-	print("\nin translate")
 
+	# using ga4gh protocol buffer, stuff SearchVariantsRequest parameters into 23andMe request
+	print("creating 23andMe request from GA4GH protobuf")
+	profile_id = session.get("profile_id")
+	ttam_request = "https://api.23andme.com/3/profile/"+profile_id+"/variant/?accession_id="+chromeToAccession[ga4gh_request.reference_name]+"&start="+str(ga4gh_request.start)+"&end="+str(ga4gh_request.end)
 
-	print(ga4gh_request)
+	headers = session.get("headers")
 
-	profile_id = session.get('profile_id')
-	#chromeToAccession[ga4gh_request.reference_name]
-	ttam_request = 'https://api.23andme.com/3/profile/'+profile_id+'/variant/?accession_id='+chromeToAccession[ga4gh_request.reference_name]+'&start='+str(ga4gh_request.start)+'&end='+str(ga4gh_request.end)
-
-	print(ttam_request)
-
-	# make a 23andMe request template
-	# oauth
-	# fill in the 23andMe template
-	# do request
-
-	# https://api.23andme.com/3/profile/'+profile_id+'/variant/?accession_id=NC_012920.1
-
-
-	headers = session.get('headers')
-	input_link = session.get('input_link')
-	#<p><a href="{{input link}}">Click here</a> to enter another query.</p>
-
-
-	print('sending request')
+	print("sending request to 23andMe")
 	profile_variant_response = requests.get(ttam_request,headers=headers, verify=False)
 	profile_variant_response_json = profile_variant_response.json()
 
 
-
-
-	print('converting response')
-	ttam_response = profile_variant_response_json['data']
-#### Under construction
-	# have to return like this because flask doesn't allow otherwise for security purposes
-	ga4gh_response = {'data':[]}
+	print("converting response to GA4GH SearchVariantResponse")
+	ttam_response = profile_variant_response_json["data"]
+	# using the GA4GH schemas, stuff in 23andMe response into SearchVariantsResponse parameters
+	# have to return like this ("data":[]) because flask doesn't allow otherwise for security purposes
+	ga4gh_response = {"data":[]}
 	for i in range(0,len(ttam_response),2):
 		# had to switch from p.Variant to something else due to json serialization errors. this took hours of head banging :(
-		response = {'reference_name':session['chrome'], 'alternate_bases':[ttam_response[i+1]['allele']], 'reference_bases':ttam_response[i]['allele'], 'start':ttam_response[i]['start'], 'end':ttam_response[i]['end'], 'variant_set_id':'1'}
 
+		response = {"reference_name":session["chrome"].encode('ascii'), "alternate_bases":[ttam_response[i+1]["allele"].encode('ascii')], "reference_bases":ttam_response[i]["allele"].encode('ascii'), "start":ttam_response[i]["start"], "end":ttam_response[i]["end"], "variant_set_id":"1"}
 
 		proto_response = p.fromJson(json.dumps(response), v.Variant)
-		print(proto_response)
-
-		ga4gh_response['data'].append(response)
-####
+		ga4gh_response["data"].append(response)
 	
-	print("out loop")
-	print(ga4gh_response['data'][0])
-
-
 	if profile_variant_response.status_code == 200:
-		#return flask.render_template('receive_code.html', response_json=profile_variant_response_json)
-		return(flask.jsonify(ga4gh_response))
+		# ga4gh_response is ths JSON we want, push it to results.html so the user can see their data
+		return flask.render_template("results.html", ga4gh_response=ga4gh_response)
+
 	else:
-		# print 'response text = ', genotype_response.text
 		profile_variant_response.raise_for_status()
 
-	#return(request(ttam_request))
-	return(flask.jsonify({}))
-
-
-### table
-### report request
-### grch? what reference, grch38, querying 1kgenomes.ga4gh.org/ga4gh/reference/search, along those lines for reference bases
-
-### Conversion to do:
-### accession_id to 	reference_name
-### allele 		 to 	alternate_bases?
-### start 		 to 	start
-### end 		 to 	end
-### variant_set_id = 1
-### call_set_ids = whatever id used to query (whoever im querying against), otherwise number 1
-
-###	To fill?:
-### table
-### reference_bases, perhaps go get it
-### variant type, none, can use other 23andme request to get if needed (get_report)
 
 app.secret_key = keys.sessions_key
 
-if __name__ == '__main__':
-	print "A local client for the Personal Genome API is now initialized."
+if __name__ == "__main__":
+	print "A local client for GA4GHandMe is now initialized."
 	app.run(debug=True, port=PORT)
