@@ -28,4 +28,4 @@ After this is all complete, you can start up the server.
 python server.py
 ```
 
-and navigate to localhost:5000. The only thing you need to do from here is follow the prompts. Enjoy!
+Once that's up and running you can navigate to localhost:5000. The only thing you need to do from here is follow the prompts. Enjoy!
