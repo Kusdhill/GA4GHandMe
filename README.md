@@ -29,3 +29,6 @@ python server.py
 ```
 
 Once that's up and running you can navigate to localhost:5000. The only thing you need to do from here is follow the prompts. Enjoy!
+
+---
+This project was made possible thanks to 23andMe's <a href="https://github.com/23andMe/api-example-flask">python oauth/flask example</a>, w3school's <a href="https://www.w3schools.com/html/html_tables.asp">sample data table</a>, and the help of <a href="https://github.com/kozbo">Kevin Osborn</a> and <a href="https://github.com/david4096">David Steinberg</a>.
