@@ -19,13 +19,19 @@ Once that's setup, make a <a href="http://docs.python-guide.org/en/latest/dev/vi
 ```
 pip install virtualenv
 virtualenv virtual_env_name
+source virtual_env_name/bin/activate
 ```
 With the virual environment running, go ahead and install the requirements.txt.
 
 You should also make sure you have the GA4GH client <a href="http://ga4gh-reference-implementation.readthedocs.io/en/latest/demo.html">setup</a>.
 
+
 ```
-pip install requirements.txt
+pip install ga4gh
+```
+
+```
+pip install --upgrade -r requirements.txt
 ```
 
 After this is all complete, you can start up the server.
