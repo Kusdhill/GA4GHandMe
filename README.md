@@ -19,9 +19,8 @@ Once that's setup, make a <a href="http://docs.python-guide.org/en/latest/dev/vi
 If you don't have virtual environment already
 ```
 pip install virtualenv
-
-
 ```
+
 Once you have that you can make a virtual environment
 
 ```
