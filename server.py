@@ -181,4 +181,4 @@ app.secret_key = keys.sessions_key
 
 if __name__ == "__main__":
 	print "A local client for GA4GHandMe is now initialized."
-	app.run(debug=True, port=PORT)
+	app.run(debug=False, port=PORT)
