@@ -16,8 +16,13 @@ Once you have done this 23andMe will give you two credentials: a client id, and 
 
 Once that's setup, make a <a href="http://docs.python-guide.org/en/latest/dev/virtualenvs/">virtual environment</a>. 
 
+If you don't have virtual environment already
 ```
 pip install virtualenv
+```
+Once you have that you can
+
+```
 virtualenv virtual_env_name
 source virtual_env_name/bin/activate
 ```
