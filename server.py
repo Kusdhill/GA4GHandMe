@@ -8,7 +8,7 @@ import os
 from optparse import OptionParser
 from requests_oauthlib import OAuth2Session
 import keys
-from ga4gh.client import protocol as p
+from ga4gh.schemas import protocol as p
 import ga4gh.schemas.ga4gh.variants_pb2 as v
 
 PORT = 5000
