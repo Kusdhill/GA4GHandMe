@@ -2,7 +2,7 @@
 
 The goal of this project is to build a GA4GH API wrapper around the 23andMe REST API. The work will result in a server that can be started by a user. The user will be required to provide their 23andMe credentials. The server will then use those to connect with the 23andMe REST interface. The server will then respond to GA4GH variant API requests from that user only. There are many people who have used 23andMe and this project will allow any GA4GH API compatible application to run against their 23andMe variant information.
 
-The purpose of this project is to allow individuals to retrieve information about their personal genomics from 23andMe and receive a <a href="http://1kgenomes.ga4gh.org/">Global Alliance for Genomic Health</a> (GA4GH) response. GA4GH aims to create a standard for how genomic data is organized with the hopes of simplifying the reception and exhange of genomic data. You can read more about <a href="http://genomicsandhealth.org/">GA4GH</a> here.
+The purpose of this project is to allow individuals to retrieve information about their personal genomics from 23andMe and receive a <a href="http://1kgenomes.ga4gh.org/">Global Alliance for Genomic Health</a> (GA4GH) response. GA4GH aims to create a standard for how genomic data is organized with the hopes of simplifying the reception and exhange of genomic data. You can read more about GA4GH <a href="http://genomicsandhealth.org/">here</a>.
 
 # Usage
 
