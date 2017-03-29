@@ -9,7 +9,7 @@ against their 23andMe variant information.
 
 # Goal
 
-The point of this project is to allow individuals to retrieve information about their personal genomics from 23andMe and recieve a <a href="http://1kgenomes.ga4gh.org/">Global Alliance for Genomic Health</a> (GA4GH) response. GA4GH aims to create a standard for how genomic data is organized with the hopes of simplifying recieving genomic information using an API.
+The point of this project is to allow individuals to retrieve information about their personal genomics from 23andMe and receive a <a href="http://1kgenomes.ga4gh.org/">Global Alliance for Genomic Health</a> (GA4GH) response. GA4GH aims to create a standard for how genomic data is organized with the hopes of simplifying the reception and exhange of genomic data. You can read more about <a href="http://genomicsandhealth.org/">GA4GH</a> here.
 
 # Usage
 
