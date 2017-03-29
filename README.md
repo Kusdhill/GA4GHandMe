@@ -11,8 +11,13 @@ against their 23andMe variant information.
 
 To begin, you should clone this repository. If you don't know how to do that, you can just download the code to your Desktop.
 
+If this is your first time registering a client to 23andMe, you will see a page like the one below.
+![alt text](https://github.com/Kusdhill/GA4GHandMe/blob/master/templates/client.png "client_registration")
+
+You can fill out the parameters exactly as I have.
+
 Before opening any of the files you will have to <a href="https://api.23andme.com/dev/">register</a> an API client with 23andMe. You can use the same parameters in the image below:
-![alt text](https://github.com/Kusdhill/GA4GHandMe/blob/master/templates/registration.png "client_registration")
+![alt text](https://github.com/Kusdhill/GA4GHandMe/blob/master/templates/registration.png "client_authentication")
 
 Once you have done this, 23andMe will give you two credentials: a client id, and a client secret. Put both of these in keys.py, along with a sessions key for flask. The sessions key can be anything.
 
