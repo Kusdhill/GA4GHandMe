@@ -7,9 +7,17 @@ then respond to GA4GH variant API requests from that user only. There are many p
 have used 23andMe and this project will allow any GA4GH API compatible application to run
 against their 23andMe variant information.
 
+# Goal
+
+The point of this project is to allow individuals to retrieve information about their personal genomics from 23andMe and recieve a <a href="http://1kgenomes.ga4gh.org/">Global Alliance for Genomic Health</a> (GA4GH) response. GA4GH aims to create a standard for how genomic data is organized with the hopes of simplifying recieving genomic information using an API.
+
 # Usage
 
+Disclaimer: These instructions work as of March 2017. 23andMe may change how their application registration works and that may in turn change how this application works. If you run into a problem, feel free to open up an issue and I'll try my best to resolve it in a timely manner. Thanks!
+
 To begin, you should clone this repository. If you don't know how to do that, you can just download the code to your Desktop.
+
+If you don't have a 23andMe account already, you can register a developer account <a href="https://api.23andme.com/cas/create/?redirect=%2Fdev%2F">here</a>. If you just want to test drive this program and haven't actually sampled your genome with 23andMe, that's fine too. 23andMe has sample information with every account.
 
 If this is your first time registering a client to 23andMe, you will see a page like the one below.
 ![alt text](https://github.com/Kusdhill/GA4GHandMe/blob/master/templates/client.png "client_registration")
